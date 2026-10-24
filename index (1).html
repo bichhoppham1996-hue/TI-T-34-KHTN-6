@@ -1,0 +1,716 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bài kiểm tra KHTN 6: Chương I, II, VI</title>
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-hover: #1d4ed8;
+            --bg: #f8fafc;
+            --card-bg: #ffffff;
+            --text: #1e293b;
+            --border: #e2e8f0;
+            --success: #16a34a;
+            --error: #dc2626;
+            --warning: #d97706;
+        }
+
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            line-height: 1.5;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: var(--card-bg);
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            text-align: center;
+            color: var(--primary);
+            margin-bottom: 24px;
+        }
+
+        .admin-bar {
+            display: flex;
+            justify-content: flex-end;
+            margin-bottom: 20px;
+            gap: 10px;
+        }
+
+        .btn {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 10px 18px;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn:hover {
+            background-color: var(--primary-hover);
+        }
+
+        .btn-warning { background-color: var(--warning); }
+        .btn-warning:hover { background-color: #b45309; }
+        .btn-success { background-color: var(--success); }
+        .btn-success:hover { background-color: #15803d; }
+
+        .question-card {
+            background: #fff;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .question-title {
+            font-weight: 600;
+            font-size: 1.1rem;
+            margin-bottom: 15px;
+        }
+
+        .options label {
+            display: block;
+            padding: 10px;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            margin-bottom: 8px;
+            cursor: pointer;
+        }
+
+        .options label:hover {
+            background-color: #f1f5f9;
+        }
+
+        .options input[type="radio"] {
+            margin-right: 10px;
+        }
+
+        .tf-grid {
+            display: grid;
+            grid-template-columns: 1fr auto auto;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .tf-row {
+            display: contents;
+        }
+
+        .tf-text {
+            padding: 8px 0;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .tf-opt {
+            padding: 8px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            box-sizing: border-box;
+        }
+
+        /* Sortable List */
+        .sortable-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .sortable-item {
+            background: #f1f5f9;
+            border: 1px solid var(--border);
+            padding: 10px 15px;
+            margin-bottom: 6px;
+            border-radius: 6px;
+            cursor: grab;
+            display: flex;
+            align-items: center;
+        }
+
+        .sortable-item::before {
+            content: ':::';
+            margin-right: 12px;
+            color: #94a3b8;
+            font-weight: bold;
+        }
+
+        /* Matching */
+        .match-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .match-select {
+            width: 100%;
+            padding: 8px;
+            border-radius: 6px;
+            border: 1px solid var(--border);
+        }
+
+        .result-box {
+            display: none;
+            background: #e0f2fe;
+            border: 1px solid #0284c7;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+            margin-top: 20px;
+            font-size: 1.2rem;
+            font-weight: bold;
+        }
+
+        .correct-ans {
+            color: var(--success);
+            font-weight: bold;
+            margin-top: 8px;
+            display: none;
+        }
+
+        .wrong-ans {
+            color: var(--error);
+            font-weight: bold;
+        }
+
+        .admin-controls {
+            display: none;
+            background: #fef3c7;
+            border: 1px solid #f59e0b;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="admin-bar">
+        <button class="btn btn-warning" onclick="loginAdmin()">Quản trị viên</button>
+    </div>
+
+    <div id="adminControls" class="admin-controls">
+        <h3>Chế độ Quản trị viên</h3>
+        <p>Thầy/Cô có thể chỉnh sửa đáp án hoặc xem toàn bộ khóa đáp án chi tiết.</p>
+        <button class="btn btn-success" onclick="toggleAnswers()">Ẩn/Hiện Đáp Án</button>
+        <button class="btn" onclick="logoutAdmin()">Thoát Quản trị</button>
+    </div>
+
+    <h1>BÀI KIỂM TRA KHOA HỌC TỰ NHIÊN 6<br><small style="font-size: 1rem; color: #64748b;">Thang điểm: 10.0</small></h1>
+
+    <div class="question-card" id="studentInfo">
+        <div class="question-title">Thông tin học sinh</div>
+        <div style="display:grid;grid-template-columns:2fr 1fr;gap:10px;">
+            <input type="text" id="studentName" placeholder="Họ và tên">
+            <input type="text" id="studentClass" placeholder="Lớp">
+        </div>
+    </div>
+
+    <form id="quizForm">
+        <!-- Q1 -->
+        <div class="question-card" id="q1">
+            <div class="question-title">Câu 1: Trong phòng thực hành, biển báo có hình ngọn lửa biểu thị cảnh báo về điều gì?</div>
+            <div class="options">
+                <label><input type="radio" name="q1" value="A"> A. Chất độc hại</label>
+                <label><input type="radio" name="q1" value="B"> B. Nguồn điện nguy hiểm</label>
+                <label><input type="radio" name="q1" value="C"> C. Dụng cụ sắc nhọn</label>
+                <label><input type="radio" name="q1" value="D"> D. Chất dễ cháy</label>
+            </div>
+            <div class="correct-ans" data-ans="D">Đáp án đúng: D. Chất dễ cháy</div>
+        </div>
+
+        <!-- Q2 -->
+        <div class="question-card" id="q2">
+            <div class="question-title">Câu 2: Trong Hệ đơn vị đo lường hợp pháp của nước ta, đơn vị cơ bản dùng để đo khối lượng là</div>
+            <div class="options">
+                <label><input type="radio" name="q2" value="A"> A. miligam (mg)</label>
+                <label><input type="radio" name="q2" value="B"> B. kilôgam (kg)</label>
+                <label><input type="radio" name="q2" value="C"> C. tạ</label>
+                <label><input type="radio" name="q2" value="D"> D. gam (g)</label>
+            </div>
+            <div class="correct-ans" data-ans="B">Đáp án đúng: B. kilôgam (kg)</div>
+        </div>
+
+        <!-- Q3 -->
+        <div class="question-card" id="q3">
+            <div class="question-title">Câu 3: Quá trình một chất chuyển từ thể lỏng sang thể hơi đồng thời diễn ra cả trên bề mặt và trong lòng khối chất lỏng được gọi là</div>
+            <div class="options">
+                <label><input type="radio" name="q3" value="A"> A. sự sôi</label>
+                <label><input type="radio" name="q3" value="B"> B. sự ngưng tụ</label>
+                <label><input type="radio" name="q3" value="C"> C. sự nóng chảy</label>
+                <label><input type="radio" name="q3" value="D"> D. sự bay hơi</label>
+            </div>
+            <div class="correct-ans" data-ans="A">Đáp án đúng: A. sự sôi</div>
+        </div>
+
+        <!-- Q4 -->
+        <div class="question-card" id="q4">
+            <div class="question-title">Câu 4: Trong không khí ở điều kiện thông thường, khí nào chiếm tỉ lệ thể tích lớn nhất?</div>
+            <div class="options">
+                <label><input type="radio" name="q4" value="A"> A. Khí carbon dioxide (khoảng 1%)</label>
+                <label><input type="radio" name="q4" value="B"> B. Khí nitrogen (khoảng 78%)</label>
+                <label><input type="radio" name="q4" value="C"> C. Hơi nước và các khí khác</label>
+                <label><input type="radio" name="q4" value="D"> D. Khí oxygen (khoảng 21%)</label>
+            </div>
+            <div class="correct-ans" data-ans="B">Đáp án đúng: B. Khí nitrogen (khoảng 78%)</div>
+        </div>
+
+        <!-- Q5 -->
+        <div class="question-card" id="q5">
+            <div class="question-title">Câu 5: Tập hợp các tế bào có hình dạng, cấu tạo giống nhau và cùng phối hợp thực hiện một chức năng nhất định được gọi là</div>
+            <div class="options">
+                <label><input type="radio" name="q5" value="A"> A. mô</label>
+                <label><input type="radio" name="q5" value="B"> B. cơ thể</label>
+                <label><input type="radio" name="q5" value="C"> C. hệ cơ quan</label>
+                <label><input type="radio" name="q5" value="D"> D. cơ quan</label>
+            </div>
+            <div class="correct-ans" data-ans="A">Đáp án đúng: A. mô</div>
+        </div>
+
+        <!-- Q6 -->
+        <div class="question-card" id="q6">
+            <div class="question-title">Câu 6: Trong hệ thống phân loại sinh vật năm giới, giới nào sau đây bao gồm các sinh vật nhân sơ có cấu tạo đơn bào?</div>
+            <div class="options">
+                <label><input type="radio" name="q6" value="A"> A. Giới Nguyên sinh</label>
+                <label><input type="radio" name="q6" value="B"> B. Giới Khởi sinh</label>
+                <label><input type="radio" name="q6" value="C"> C. Giới Nấm</label>
+                <label><input type="radio" name="q6" value="D"> D. Giới Động vật</label>
+            </div>
+            <div class="correct-ans" data-ans="B">Đáp án đúng: B. Giới Khởi sinh</div>
+        </div>
+
+        <!-- Q7 -->
+        <div class="question-card" id="q7">
+            <div class="question-title">Câu 7: Chọn Đúng hoặc Sai cho mỗi nhận định sau:</div>
+            <div class="tf-grid">
+                <div class="tf-text">A. Thang nhiệt độ Xen-xi-út quy ước nhiệt độ của nước đá đang tan là 0 °C và nhiệt độ của hơi nước đang sôi là 100 °C.</div>
+                <div class="tf-opt"><label><input type="radio" name="q7_a" value="D"> Đúng</label></div>
+                <div class="tf-opt"><label><input type="radio" name="q7_a" value="S"> Sai</label></div>
+
+                <div class="tf-text">B. Sự bay hơi và sự ngưng tụ của một chất chỉ xảy ra ở đúng nhiệt độ sôi.</div>
+                <div class="tf-opt"><label><input type="radio" name="q7_b" value="D"> Đúng</label></div>
+                <div class="tf-opt"><label><input type="radio" name="q7_b" value="S"> Sai</label></div>
+
+                <div class="tf-text">C. Mỗi chất lỏng tinh khiết đều sôi ở một nhiệt độ xác định gọi là nhiệt độ sôi.</div>
+                <div class="tf-opt"><label><input type="radio" name="q7_c" value="D"> Đúng</label></div>
+                <div class="tf-opt"><label><input type="radio" name="q7_c" value="S"> Sai</label></div>
+
+                <div class="tf-text">D. Khi đang đun cho nước sôi hoàn toàn, nhiệt độ của nước tiếp tục tăng dần lên đến 150 °C.</div>
+                <div class="tf-opt"><label><input type="radio" name="q7_d" value="D"> Đúng</label></div>
+                <div class="tf-opt"><label><input type="radio" name="q7_d" value="S"> Sai</label></div>
+            </div>
+            <div class="correct-ans" data-ans="A:Đúng, B:Sai, C:Đúng, D:Sai">Đáp án đúng: A-Đúng, B-Sai, C-Đúng, D-Sai</div>
+        </div>
+
+        <!-- Q8 -->
+        <div class="question-card" id="q8">
+            <div class="question-title">Câu 8: Chọn Đúng hoặc Sai cho các nhận định sau:</div>
+            <div class="tf-grid">
+                <div class="tf-text">A. Trùng roi, trùng biến hình và vi khuẩn đều là các ví dụ điển hình về cơ thể đơn bào.</div>
+                <div class="tf-opt"><label><input type="radio" name="q8_a" value="D"> Đúng</label></div>
+                <div class="tf-opt"><label><input type="radio" name="q8_a" value="S"> Sai</label></div>
+
+                <div class="tf-text">B. Ở cơ thể người, dạ dày là một hệ cơ quan hoàn chỉnh độc lập.</div>
+                <div class="tf-opt"><label><input type="radio" name="q8_b" value="D"> Đúng</label></div>
+                <div class="tf-opt"><label><input type="radio" name="q8_b" value="S"> Sai</label></div>
+
+                <div class="tf-text">C. Hệ thống năm giới sinh vật bao gồm: Giới Khởi sinh, Giới Nguyên sinh, Giới Nấm, Giới Thực vật và Giới Động vật.</div>
+                <div class="tf-opt"><label><input type="radio" name="q8_c" value="D"> Đúng</label></div>
+                <div class="tf-opt"><label><input type="radio" name="q8_c" value="S"> Sai</label></div>
+
+                <div class="tf-text">D. Trong tên khoa học của một loài sinh vật (ví dụ Apis cerana), chữ thứ nhất chỉ tên loài, chữ thứ hai chỉ tên chi (giống).</div>
+                <div class="tf-opt"><label><input type="radio" name="q8_d" value="D"> Đúng</label></div>
+                <div class="tf-opt"><label><input type="radio" name="q8_d" value="S"> Sai</label></div>
+            </div>
+            <div class="correct-ans" data-ans="A:Đúng, B:Sai, C:Đúng, D:Sai">Đáp án đúng: A-Đúng, B-Sai, C-Đúng, D-Sai</div>
+        </div>
+
+        <!-- Q9 -->
+        <div class="question-card" id="q9">
+            <div class="question-title">Câu 9: Điền từ thích hợp vào chỗ trống:</div>
+            <p>Khí không màu, không mùi, ít tan trong nước, chiếm khoảng 21% thể tích không khí và có vai trò duy trì sự sống cũng như sự cháy trên Trái Đất có tên là gì?</p>
+            <input type="text" name="q9" placeholder="Nhập đáp án của em...">
+            <div class="correct-ans" data-ans="oxygen">Đáp án đúng: oxygen (hoặc ôxi, ôxy)</div>
+        </div>
+
+        <!-- Q10 -->
+        <div class="question-card" id="q10">
+            <div class="question-title">Câu 10: Điền từ thích hợp vào chỗ trống:</div>
+            <p>Ở thực vật có hoa, hai hệ cơ quan chính cấu tạo nên cơ thể là hệ chồi và hệ gì?</p>
+            <input type="text" name="q10" placeholder="Nhập đáp án của em...">
+            <div class="correct-ans" data-ans="hệ rễ">Đáp án đúng: hệ rễ (hoặc rễ)</div>
+        </div>
+
+        <!-- Q11 -->
+        <div class="question-card" id="q11">
+            <div class="question-title">Câu 11: Kéo thả để sắp xếp các bước theo đúng quy trình đo chiều dài của một vật bằng thước thẳng:</div>
+            <ul class="sortable-list" id="sort_q11">
+                <li class="sortable-item" draggable="true" data-id="3">Đặt mắt nhìn theo hướng vuông góc với cạnh thước ở đầu kia của vật.</li>
+                <li class="sortable-item" draggable="true" data-id="1">Ước lượng chiều dài cần đo để chọn thước đo thích hợp.</li>
+                <li class="sortable-item" draggable="true" data-id="5">Ghi kết quả đo theo ĐCNN của thước.</li>
+                <li class="sortable-item" draggable="true" data-id="2">Đặt thước dọc theo chiều dài cần đo, vạch số 0 của thước ngang với một đầu của vật.</li>
+                <li class="sortable-item" draggable="true" data-id="4">Đọc kết quả đo theo vạch chia gần nhất với đầu kia của vật.</li>
+            </ul>
+            <div class="correct-ans" data-ans="1-2-3-4-5">Thứ tự đúng: 1 -> 2 -> 3 -> 4 -> 5</div>
+        </div>
+
+        <!-- Q12 -->
+        <div class="question-card" id="q12">
+            <div class="question-title">Câu 12: Kéo thả để sắp xếp các cấp tổ chức cấu tạo nên cơ thể đa bào theo thứ tự từ thấp đến cao:</div>
+            <ul class="sortable-list" id="sort_q12">
+                <li class="sortable-item" draggable="true" data-id="3">Cơ quan</li>
+                <li class="sortable-item" draggable="true" data-id="1">Tế bào</li>
+                <li class="sortable-item" draggable="true" data-id="5">Cơ thể</li>
+                <li class="sortable-item" draggable="true" data-id="2">Mô</li>
+                <li class="sortable-item" draggable="true" data-id="4">Hệ cơ quan</li>
+            </ul>
+            <div class="correct-ans" data-ans="1-2-3-4-5">Thứ tự đúng: Tế bào -> Mô -> Cơ quan -> Hệ cơ quan -> Cơ thể</div>
+        </div>
+
+        <!-- Q13 -->
+        <div class="question-card" id="q13">
+            <div class="question-title">Câu 13: Kéo thả để sắp xếp các bậc phân loại sinh vật theo thứ tự từ lớn nhất đến nhỏ nhất:</div>
+            <ul class="sortable-list" id="sort_q13">
+                <li class="sortable-item" draggable="true" data-id="4">Bộ</li>
+                <li class="sortable-item" draggable="true" data-id="1">Giới</li>
+                <li class="sortable-item" draggable="true" data-id="7">Loài</li>
+                <li class="sortable-item" draggable="true" data-id="2">Ngành</li>
+                <li class="sortable-item" draggable="true" data-id="5">Họ</li>
+                <li class="sortable-item" draggable="true" data-id="3">Lớp</li>
+                <li class="sortable-item" draggable="true" data-id="6">Chi (hoặc Giống)</li>
+            </ul>
+            <div class="correct-ans" data-ans="1-2-3-4-5-6-7">Thứ tự đúng: Giới -> Ngành -> Lớp -> Bộ -> Họ -> Chi -> Loài</div>
+        </div>
+
+        <!-- Q14 -->
+        <div class="question-card" id="q14">
+            <div class="question-title">Câu 14: Hãy ghép nối kí hiệu cảnh báo ở cột trái với ý nghĩa ở cột phải:</div>
+            <div class="match-grid">
+                <div>Hình tia sét trong tam giác viền đen nền vàng</div>
+                <div>
+                    <select name="q14_1" class="match-select">
+                        <option value="">-- Chọn ý nghĩa --</option>
+                        <option value="1">Nguy hiểm về điện</option>
+                        <option value="2">Chất độc</option>
+                        <option value="3">Chất ăn mòn</option>
+                        <option value="4">Chất độc sinh học</option>
+                    </select>
+                </div>
+                <div>Hình đầu lâu xương chéo</div>
+                <div>
+                    <select name="q14_2" class="match-select">
+                        <option value="">-- Chọn ý nghĩa --</option>
+                        <option value="1">Nguy hiểm về điện</option>
+                        <option value="2">Chất độc</option>
+                        <option value="3">Chất ăn mòn</option>
+                        <option value="4">Chất độc sinh học</option>
+                    </select>
+                </div>
+                <div>Hình chất lỏng đổ ăn mòn bề mặt</div>
+                <div>
+                    <select name="q14_3" class="match-select">
+                        <option value="">-- Chọn ý nghĩa --</option>
+                        <option value="1">Nguy hiểm về điện</option>
+                        <option value="2">Chất độc</option>
+                        <option value="3">Chất ăn mòn</option>
+                        <option value="4">Chất độc sinh học</option>
+                    </select>
+                </div>
+                <div>Hình ba vòng tròn lồng ghép nhau</div>
+                <div>
+                    <select name="q14_4" class="match-select">
+                        <option value="">-- Chọn ý nghĩa --</option>
+                        <option value="1">Nguy hiểm về điện</option>
+                        <option value="2">Chất độc</option>
+                        <option value="3">Chất ăn mòn</option>
+                        <option value="4">Chất độc sinh học</option>
+                    </select>
+                </div>
+            </div>
+            <div class="correct-ans" data-ans="1,2,3,4">Đáp án đúng: 1-Điện, 2-Chất độc, 3-Ăn mòn, 4-Độc sinh học</div>
+        </div>
+
+        <!-- Q15 -->
+        <div class="question-card" id="q15">
+            <div class="question-title">Câu 15: Nối mỗi giới sinh vật với đặc điểm cấu tạo tương ứng:</div>
+            <div class="match-grid">
+                <div>Giới Khởi sinh</div>
+                <div>
+                    <select name="q15_1" class="match-select">
+                        <option value="">-- Chọn đặc điểm --</option>
+                        <option value="1">Cơ thể đơn bào, nhân sơ, kích thước hiển vi</option>
+                        <option value="2">Phần lớn là đơn bào, nhân thực</option>
+                        <option value="3">Cơ thể đa bào, nhân thực, tự dưỡng quang hợp</option>
+                        <option value="4">Cơ thể đa bào, nhân thực, dị dưỡng, di chuyển được</option>
+                    </select>
+                </div>
+                <div>Giới Nguyên sinh</div>
+                <div>
+                    <select name="q15_2" class="match-select">
+                        <option value="">-- Chọn đặc điểm --</option>
+                        <option value="1">Cơ thể đơn bào, nhân sơ, kích thước hiển vi</option>
+                        <option value="2">Phần lớn là đơn bào, nhân thực</option>
+                        <option value="3">Cơ thể đa bào, nhân thực, tự dưỡng quang hợp</option>
+                        <option value="4">Cơ thể đa bào, nhân thực, dị dưỡng, di chuyển được</option>
+                    </select>
+                </div>
+                <div>Giới Thực vật</div>
+                <div>
+                    <select name="q15_3" class="match-select">
+                        <option value="">-- Chọn đặc điểm --</option>
+                        <option value="1">Cơ thể đơn bào, nhân sơ, kích thước hiển vi</option>
+                        <option value="2">Phần lớn là đơn bào, nhân thực</option>
+                        <option value="3">Cơ thể đa bào, nhân thực, tự dưỡng quang hợp</option>
+                        <option value="4">Cơ thể đa bào, nhân thực, dị dưỡng, di chuyển được</option>
+                    </select>
+                </div>
+                <div>Giới Động vật</div>
+                <div>
+                    <select name="q15_4" class="match-select">
+                        <option value="">-- Chọn đặc điểm --</option>
+                        <option value="1">Cơ thể đơn bào, nhân sơ, kích thước hiển vi</option>
+                        <option value="2">Phần lớn là đơn bào, nhân thực</option>
+                        <option value="3">Cơ thể đa bào, nhân thực, tự dưỡng quang hợp</option>
+                        <option value="4">Cơ thể đa bào, nhân thực, dị dưỡng, di chuyển được</option>
+                    </select>
+                </div>
+            </div>
+            <div class="correct-ans" data-ans="1,2,3,4">Đáp án đúng: 1-Nhân sơ, 2-Nguyên sinh, 3-Thực vật, 4-Động vật</div>
+        </div>
+
+        <div style="display: flex; gap: 10px; margin-top: 20px;">
+            <button type="button" class="btn btn-success" style="flex: 2;" onclick="submitQuiz()">Nộp Bài Và Chấm Điểm</button>
+            <button type="button" class="btn btn-warning" style="flex: 1;" onclick="resetWrongAnswers()">Làm Lại Câu Sai</button>
+        </div>
+    </form>
+
+    <div id="resultBox" class="result-box"></div>
+</div>
+
+<script>
+    let isAdmin = false;
+
+    // ===== Kết nối Google Sheets (Apps Script) =====
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxQb0PU9P13bYF6sBG9cTDuaQM2Wlivmps95LXX2BIl1_kDEsq8Sf7qes9lJap1fyGDkw/exec";
+
+    function sendToSheet(payload) {
+        // text/plain + no-cors để tránh lỗi CORS với Apps Script
+        return fetch(SCRIPT_URL, {
+            method: "POST",
+            mode: "no-cors",
+            headers: { "Content-Type": "text/plain;charset=utf-8" },
+            body: JSON.stringify(payload)
+        });
+    }
+
+    // Quản trị viên
+    function loginAdmin() {
+        let pass = prompt("Nhập mật khẩu quản trị viên:");
+        if (pass === "1230") {
+            isAdmin = true;
+            document.getElementById('adminControls').style.display = 'block';
+            alert("Đăng nhập quản trị thành công!");
+        } else {
+            alert("Mật khẩu không chính xác!");
+        }
+    }
+
+    function logoutAdmin() {
+        isAdmin = false;
+        document.getElementById('adminControls').style.display = 'none';
+        toggleAnswers(false);
+    }
+
+    function toggleAnswers(show) {
+        let answers = document.querySelectorAll('.correct-ans');
+        answers.forEach(ans => {
+            if (show !== undefined) {
+                ans.style.display = show ? 'block' : 'none';
+            } else {
+                ans.style.display = (ans.style.display === 'block') ? 'none' : 'block';
+            }
+        });
+    }
+
+    // Kéo thả bài sắp xếp
+    document.querySelectorAll('.sortable-list').forEach(list => {
+        let dragItem = null;
+
+        list.addEventListener('dragstart', (e) => {
+            dragItem = e.target;
+            e.target.style.opacity = '0.5';
+        });
+
+        list.addEventListener('dragend', (e) => {
+            e.target.style.opacity = '1';
+        });
+
+        list.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            const afterElement = getDragAfterElement(list, e.clientY);
+            if (afterElement == null) {
+                list.appendChild(dragItem);
+            } else {
+                list.insertBefore(dragItem, afterElement);
+            }
+        });
+    });
+
+    function getDragAfterElement(container, y) {
+        const draggableElements = [...container.querySelectorAll('.sortable-item:not(.dragging)')];
+        return draggableElements.reduce((closest, child) => {
+            const box = child.getBoundingClientRect();
+            const offset = y - box.top - box.height / 2;
+            if (offset < 0 && offset > closest.offset) {
+                return { offset: offset, element: child };
+            } else {
+                return closest;
+            }
+        }, { offset: Number.NEGATIVE_INFINITY }).element;
+    }
+
+    // Chấm điểm
+    function submitQuiz() {
+        const name = document.getElementById('studentName').value.trim();
+        const cls = document.getElementById('studentClass').value.trim();
+        if (!name) {
+            alert("Em hãy nhập họ và tên trước khi nộp bài!");
+            document.getElementById('studentName').focus();
+            return;
+        }
+
+        let score = 0;
+        let total = 15;
+        const detail = {}; // kết quả từng câu: 1 = đúng, 0 = sai
+
+        // Q1 - Q6
+        const keyRadio = { q1: 'D', q2: 'B', q3: 'A', q4: 'B', q5: 'A', q6: 'B' };
+        for (let q in keyRadio) {
+            let selected = document.querySelector(`input[name="${q}"]:checked`);
+            const ok = !!(selected && selected.value === keyRadio[q]);
+            if (ok) score++;
+            detail[q] = (selected ? selected.value : '') + (ok ? ' ✔' : ' ✘');
+        }
+
+        // Q7 & Q8 (Đúng / Sai)
+        const keyTF7 = { q7_a: 'D', q7_b: 'S', q7_c: 'D', q7_d: 'S' };
+        let correct7 = true;
+        for (let sub in keyTF7) {
+            let sel = document.querySelector(`input[name="${sub}"]:checked`);
+            if (!sel || sel.value !== keyTF7[sub]) correct7 = false;
+        }
+        if (correct7) score++;
+        detail.q7 = correct7 ? '✔' : '✘';
+
+        const keyTF8 = { q8_a: 'D', q8_b: 'S', q8_c: 'D', q8_d: 'S' };
+        let correct8 = true;
+        for (let sub in keyTF8) {
+            let sel = document.querySelector(`input[name="${sub}"]:checked`);
+            if (!sel || sel.value !== keyTF8[sub]) correct8 = false;
+        }
+        if (correct8) score++;
+        detail.q8 = correct8 ? '✔' : '✘';
+
+        // Q9 & Q10 (Điền từ)
+        let q9Val = document.querySelector('input[name="q9"]').value.trim().toLowerCase();
+        const ok9 = q9Val.includes('oxygen') || q9Val.includes('oxi') || q9Val.includes('oxy');
+        if (ok9) score++;
+        detail.q9 = q9Val + (ok9 ? ' ✔' : ' ✘');
+
+        let q10Val = document.querySelector('input[name="q10"]').value.trim().toLowerCase();
+        const ok10 = q10Val.includes('rễ') || q10Val.includes('re');
+        if (ok10) score++;
+        detail.q10 = q10Val + (ok10 ? ' ✔' : ' ✘');
+
+        // Q11 - Q13 (Sắp xếp)
+        function checkSort(id, targetOrder) {
+            let items = document.querySelectorAll(`#${id} .sortable-item`);
+            let currentOrder = Array.from(items).map(item => item.getAttribute('data-id')).join('-');
+            return currentOrder === targetOrder;
+        }
+
+        const ok11 = checkSort('sort_q11', '1-2-3-4-5'); if (ok11) score++; detail.q11 = ok11 ? '✔' : '✘';
+        const ok12 = checkSort('sort_q12', '1-2-3-4-5'); if (ok12) score++; detail.q12 = ok12 ? '✔' : '✘';
+        const ok13 = checkSort('sort_q13', '1-2-3-4-5-6-7'); if (ok13) score++; detail.q13 = ok13 ? '✔' : '✘';
+
+        // Q14 & Q15 (Nối cột)
+        function checkMatch(prefix, target) {
+            for (let i = 1; i <= 4; i++) {
+                let sel = document.querySelector(`select[name="${prefix}_${i}"]`);
+                if (!sel || sel.value !== String(target[i-1])) return false;
+            }
+            return true;
+        }
+
+        const ok14 = checkMatch('q14', [1, 2, 3, 4]); if (ok14) score++; detail.q14 = ok14 ? '✔' : '✘';
+        const ok15 = checkMatch('q15', [1, 2, 3, 4]); if (ok15) score++; detail.q15 = ok15 ? '✔' : '✘';
+
+        // Tính điểm hệ 10
+        let finalScore = ((score / total) * 10).toFixed(1);
+        let resBox = document.getElementById('resultBox');
+        resBox.style.display = 'block';
+        resBox.innerHTML = `Kết Quả Bài Làm: ${score}/${total} câu đúng.<br><span style="font-size: 1.8rem; color: #2563eb;">Điểm số: ${finalScore} / 10.0</span>`;
+        resBox.scrollIntoView({ behavior: 'smooth' });
+
+        // Gửi dữ liệu lên Google Sheets
+        const payload = {
+            timestamp: new Date().toLocaleString('vi-VN'),
+            name: name,
+            class: cls,
+            correct: score,
+            total: total,
+            score: finalScore,
+            detail: detail
+        };
+        sendToSheet(payload)
+            .then(() => { resBox.innerHTML += '<div style="font-size:0.9rem;color:#16a34a;margin-top:8px;">✓ Đã gửi kết quả cho giáo viên</div>'; })
+            .catch(() => { resBox.innerHTML += '<div style="font-size:0.9rem;color:#dc2626;margin-top:8px;">✗ Gửi kết quả thất bại, vui lòng kiểm tra mạng</div>'; });
+    }
+
+    // Làm lại các câu sai
+    function resetWrongAnswers() {
+        // Reset trắc nghiệm
+        const keyRadio = { q1: 'D', q2: 'B', q3: 'A', q4: 'B', q5: 'A', q6: 'B' };
+        for (let q in keyRadio) {
+            let selected = document.querySelector(`input[name="${q}"]:checked`);
+            if (selected && selected.value !== keyRadio[q]) {
+                selected.checked = false;
+            }
+        }
+
+        // Reset điền từ sai
+        let q9Val = document.querySelector('input[name="q9"]').value.trim().toLowerCase();
+        if (!q9Val.includes('oxygen') && !q9Val.includes('oxi') && !q9Val.includes('oxy')) {
+            document.querySelector('input[name="q9"]').value = '';
+        }
+
+        let q10Val = document.querySelector('input[name="q10"]').value.trim().toLowerCase();
+        if (!q10Val.includes('rễ') && !q10Val.includes('re')) {
+            document.querySelector('input[name="q10"]').value = '';
+        }
+
+        alert("Đã xóa đáp án các câu chọn sai để em làm lại!");
+    }
+</script>
+
+</body>
+</html>
